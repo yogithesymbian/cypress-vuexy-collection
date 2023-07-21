@@ -67,6 +67,26 @@ describe('Multiple File Upload Test', () => {
   });
 });
 
+// command.js
+Cypress.Commands.add("uploadFiles", (filePaths) => {
+  cy.get("#files").then((dropzone) => {
+    const filePath = `assets/${filePaths[0]}`;
+    cy.fixture(filePath, "base64").then((fileContent) => {
+      const blob = Cypress.Blob.base64StringToBlob(fileContent, "image/png");
+      const file = new File([blob], filePaths[0], { type: "image/png" });
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+
+      dropzone[0].dispatchEvent(new DragEvent("drop", { dataTransfer }));
+
+      if (filePaths.length > 1) {
+        cy.uploadFiles(filePaths.slice(1));
+      }
+    });
+  });
+});
+// -----------
 // =============
 // END OF MULTIPLE FILE
 // =============
